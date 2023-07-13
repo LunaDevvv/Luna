@@ -1,0 +1,19 @@
+{
+  "name": "luna_assistant",
+  "version": "0.0.1",
+  "description": "An AI powered virtual assistant. Mainly for just talking.",
+  "main": "./dist/index.js",
+  "scripts": {
+    "dev": "npm i && tsc && node .",
+    "test": "npm run dev"
+  },
+  "author": "ShiroDevv",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.4.2"
+  },
+  "dependencies": {
+    "discord.js": "^14.11.0",
+    "readline": "^1.3.0"
+  }
+}
