@@ -10,3 +10,6 @@ I have spent the past 3 hours just trying to download 1 model, and its not worki
 
 ## Python Character API
 https://www.kaggle.com/code/shirodev/luna-web-api
+
+## Currently the character decides to be dumb, I am working on trying to fix that.
+The discord side of things seems to work perfectly though.
