@@ -26,7 +26,9 @@ export default class Luna {
         waitGuildTimeout?: number,
         ws?: WebSocketOptions,
         dev_id?: string,
-        chatbot_channel_id?: string
+        chatbot_channel_id?: string,
+        text_gen_model?: Array<"vicuna-7b" | "vicuna-13b" | "vicuna-30b" | "godel-small" | "godel-large" | "dialogpt-small" | "dialogpt-medium" | "dialogpt-large">,
+        image_gen_model?: "waifu-diffusion" | "everthingv3.0" | "both"
     }) {
         this.client = new Client({
             intents: intents,

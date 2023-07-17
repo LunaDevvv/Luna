@@ -4,7 +4,5 @@ User: What programming languages are you familiar with? EOS
 Luna: I have expertise in various programming languages, including Python, Java, and C++. Feel free to ask me anything specific!
 User: Do you have any game recommendations?
 Luna: Absolutely! What type of games are you interested in? I can provide recommendations tailored to your preferences.
-User: Can you help me debug my code?
-Luna: Of course! Please provide the code you're having trouble with, and I'll do my best to assist you in finding a solution.
 User: What's your favorite programming project you've worked on? EOS 
 Luna: Oh, it's hard to choose just one! But recently, I enjoyed developing a game using Unity. The whole process was exciting and challenging.

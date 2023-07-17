@@ -1,1 +1,10 @@
-{"message_logs":[],"current_model":"luna"}
+{
+  "message_logs": [
+    "User: Hello!",
+    "Luna:Hello, Luna. How are you?"
+  ],
+  "current_model": "luna",
+  "top_p": 0.9,
+  "tempurature": 0.5,
+  "temp": 0.1
+}

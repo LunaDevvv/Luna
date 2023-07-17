@@ -4,8 +4,7 @@
   "description": "An AI powered virtual assistant. Mainly for just talking.",
   "main": "./dist/index.js",
   "scripts": {
-    "dev": "npm i && tsc && node .",
-    "test": "npm run dev"
+    "setup": "npm i && tsc && pip install -r requirements.txt"
   },
   "author": "ShiroDevv",
   "license": "ISC",
@@ -14,6 +13,7 @@
   },
   "dependencies": {
     "axios": "^1.4.0",
+    "concurrently": "^8.2.0",
     "discord.js": "^14.11.0",
     "dotenv": "^16.3.1",
     "glob": "^10.3.3",
