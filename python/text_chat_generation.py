@@ -1,40 +1,74 @@
-# Run options :
-# vicuna-7b
-# vicuna-13b
-# vicuna-30b
-# GODEL-small
-# GODEL-large
-# DialoGPT-small
-# DialoGPT-medium
-# DialoGPT-large
-
 import sys
+import torch
+from transformers import AutoModelForCausalLM, AutoModelForSeq2SeqLM, AutoTokenizer
+from flask import Flask, request, Response
+from flask_cors import CORS
+import accelerate
 
-model_names = []
+checkpoints = []
+cpu_only = False
+
+class Model:
+    model : any
+    tokenizer : any
+    in_use : any
+
+    def __init__(self, model, tokenizer, model_name):
+        self.model = model
+        self.tokenizer = tokenizer
+        self.model_name = model_name
 
 for i in range(len(sys.argv)):
     if sys.argv[i] == "--model":
-        model_names.append(sys.argv[i + 1])
+        checkpoints.append(sys.argv[i + 1])
 
-checkpoints = []
+    if sys.argv[i] == "--cpu":
+        cpu_only = True
 
-for i in range(len(model_names)):
-    match model_names[i]:
-        case "vicuna-7b":
-            checkpoints.append("lmsys/vicuna-7b-v1.3")
-        case "vicuna-13b":
-            checkpoints.append("lmsys/vicuna-13b-v1.3")
-        case "vicuna-33b": 
-            checkpoints.append("lmsys/vicuna-33b-v1.3")
-        case "godel-small":
-            checkpoints.append("microsoft/GODEL-v1_1-base-seq2seq")
-        case "godel-large":
-            checkpoints.append("microsoft/GODEL-v1_1-large-seq2seq")
-        case "dialogpt-small":
-            checkpoints.append("microsoft/DialoGPT-small")
-        case "dialogpt-medium":
-            checkpoints.append("microsoft/DialoGPT-medium")
-        case "dialogpt-large":
-            checkpoints.append("microsoft/DialoGPT-large")
-        case _: 
-            print(f"Unknown model : {model_names[i]}, skipping...")
+models = []
+
+device = "cpu"
+
+if torch.cuda.is_available() and cpu_only != True:
+    device = "cuda"
+
+
+for i in range(len(checkpoints)):
+    model = None
+    
+    if "seq2seq" in checkpoints[i]:
+        model = AutoModelForSeq2SeqLM.from_pretrained(checkpoints[i], device_map="auto")
+    else:
+        model = AutoModelForCausalLM.from_pretrained(checkpoints[i], device_map="auto")
+    
+    tokenizer = AutoTokenizer.from_pretrained(checkpoints[i])
+
+    model = model.to(device)
+    
+    models.append(Model(model, tokenizer, checkpoints[i]))
+
+
+app = Flask(__name__)
+CORS(app)
+
+
+# This requires pre-formatted prompts, and the checkpoint of the model you want to generate with
+@app.route("/chat", methods=["GET"])
+def chat():
+    prompt = request.args.get("prompt")
+    model = request.args.get("model")
+    top_p = request.args.get("top_p")
+    tempurature = request.args.get("tempurature")
+
+    for i in range(len(models)):
+        if models[i].model_name == model:
+            input_ids = models[i].tokenizer(prompt, return_tensors="pt").to(device)
+
+            outputs = models[i].model.generate(input_ids.input_ids, max_length=128, min_length=8, do_sample=True, top_p=float(top_p), temperature=float(tempurature))
+
+            return tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+    return "Failed to find model!"
+
+if __name__ == "__main__":
+    app.run()

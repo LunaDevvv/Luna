@@ -1,3 +1,5 @@
+// 
+
 import { ActivityType, Partials, PresenceData } from "discord.js";
 import Luna from "./Luna/luna";
 import dotenv from "dotenv";
@@ -21,6 +23,10 @@ const LUNA = new Luna(LUNA_TOKEN, ["Guilds", "GuildMembers", "GuildMessages", "G
     partials: [Partials.Message, Partials.Channel],
     presence: presence,
     dev_id: DEV_ID,
-    chatbot_channel_id : CHANNEL_ID
+    chatbot_channel_id : CHANNEL_ID,
+    text_gen_models : ["microsoft/GODEL-v1_1-base-seq2seq", "microsoft/DialoGPT-small"],
+    cpu_only : true,
+    base_model: "microsoft/GODEL-v1_1-base-seq2seq"
 });
+
 export default LUNA;

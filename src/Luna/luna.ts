@@ -1,6 +1,9 @@
-import { GatewayIntentsString, Client, Message, CommandInteraction, ActivityType, Partials, MessageMentionOptions, CacheFactory, PresenceData, ClientOptions, RESTOptions, SweepOptions, SweeperOptions, WebSocketOptions  } from "discord.js";
+import { GatewayIntentsString, Client, Message, CommandInteraction, Partials, MessageMentionOptions, CacheFactory, PresenceData, RESTOptions, SweeperOptions, WebSocketOptions  } from "discord.js";
 import { glob } from "glob";
 import generate from "./ai_message/generate_message";
+import { exec } from "child_process";
+import { error } from "console";
+
 
 export default class Luna {
     client: Client;
@@ -10,6 +13,9 @@ export default class Luna {
     ngrok_link: string | undefined = undefined;
     dev_id?: string;
     channel_id? : string;
+    text_gen_models?: Array<string>;
+    cpu_only: boolean = true;
+    base_model?: string;
     
     constructor(token: string, intents: Array<GatewayIntentsString>, extra_data?: {
         partials?: Array<Partials>,
@@ -27,8 +33,10 @@ export default class Luna {
         ws?: WebSocketOptions,
         dev_id?: string,
         chatbot_channel_id?: string,
-        text_gen_model?: Array<"vicuna-7b" | "vicuna-13b" | "vicuna-30b" | "godel-small" | "godel-large" | "dialogpt-small" | "dialogpt-medium" | "dialogpt-large">,
-        image_gen_model?: "waifu-diffusion" | "everthingv3.0" | "both"
+        text_gen_models?: Array<"lmsys/vicuna-7b-v1.3" | "lmsys/vicuna-13b-v1.3" | "lmsys/vicuna-33b-v1.3" | "microsoft/GODEL-v1_1-base-seq2seq" | "microsoft/GODEL-v1_1-large-seq2seq" | "microsoft/DialoGPT-small" | "microsoft/DialoGPT-medium" | "microsoft/DialoGPT-large">,
+        image_gen_model?: "waifu-diffusion" | "everthingv3.0" | "both",
+        cpu_only? : boolean,
+        base_model?: string
     }) {
         this.client = new Client({
             intents: intents,
@@ -53,6 +61,20 @@ export default class Luna {
         this.dev_id = extra_data?.dev_id;
         this.channel_id = extra_data?.chatbot_channel_id;
 
+        if(extra_data?.cpu_only) {
+            this.cpu_only = extra_data.cpu_only
+        }
+
+        if(extra_data?.base_model) {
+            this.base_model = extra_data.base_model;
+        }
+
+        if(extra_data?.text_gen_models && !this.base_model) {
+            this.base_model = extra_data.text_gen_models[0]
+        }
+
+        this.text_gen_models = extra_data?.text_gen_models;
+
         this.#event_handler();
 
         this.client.login(token);
@@ -61,6 +83,19 @@ export default class Luna {
     #event_handler() {
         this.client.on("ready", async () => {
             console.log(`Logged in as ${this.client.user?.tag}`);
+
+            if(this.text_gen_models) {
+                console.log(this.text_gen_models);
+                let cpu_text = "--cpu"
+                if(this.cpu_only == false) cpu_text = "";
+                exec(`python3 ${__dirname.replaceAll("\\", "/").replace("/dist/Luna", "")}/python/text_chat_generation.py ${cpu_text} --model ${this.text_gen_models.join(" --model ")}`, async (err, stdout, stderr) => {
+                    console.log(`stdout : ${stdout}`);
+                    console.log(`stderr : ${stderr}`);
+                    if(error !== null) {
+                        console.log(`exec error : ${error}`);
+                    }
+                });
+            }
 
             this.#registerCommands();
         });

@@ -30,19 +30,19 @@ const AI_command : command = {
         let message_dir : string = `${__dirname.replaceAll("\\", "/").replace("/dist/Luna/commands/AI", "")}/message_logs/${interaction.user.id}.json`;
 
         let data : {
-            current_model? : string,
+            current_character? : string,
             [key : string] : any
         } | undefined;
 
         if(!fs.existsSync(message_dir)) {
             data = {
-                current_model : character
+                current_character : character
             }
         } else {
             data = JSON.parse(fs.readFileSync(message_dir).toString());
 
             if(!data) data = {};
-            data.current_model = character;
+            data.current_character = character;
         }
 
         fs.writeFileSync(message_dir, JSON.stringify(data, null, 2));
