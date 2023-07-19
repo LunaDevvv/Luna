@@ -11,7 +11,6 @@ cpu_only = False
 class Model:
     model : any
     tokenizer : any
-    in_use : any
 
     def __init__(self, model, tokenizer, model_name):
         self.model = model
